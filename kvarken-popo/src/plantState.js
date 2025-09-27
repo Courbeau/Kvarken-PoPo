@@ -33,6 +33,40 @@ export const plantState = reactive({
   
   // Chart settings
   chartPeriod: 'realtime', // 'realtime', 'day', 'week', 'month'
+  
+  // Regional settings and compliance data
+  region: 'EU', // 'EU', 'US', 'China'
+  plantCapacity: 18.5, // MW - total plant capacity
+  
+  // Region-specific regulatory data
+  regulatory: {
+    // EU specific
+    euAllowances: {
+      purchased: 2450, // EUAs purchased
+      surrendered: 1890, // EUAs surrendered
+      remaining: 560 // Current balance
+    },
+    
+    // China specific
+    efficiency: {
+      benchmark: 310, // gCO2/kWh benchmark
+      actual: 0, // Calculated from current operations
+      extraAllowancesRequired: 0
+    },
+    ccerOffsets: 125, // tons CO2 offset via CCER
+    
+    // US specific
+    carbonCredits: {
+      purchased: 890, // Credits purchased
+      surrendered: 340, // Credits surrendered  
+      remaining: 550 // Current balance
+    },
+    
+    // Common metrics
+    co2EmissionsPerMWh: 0, // Updated in real-time
+    verificationStatus: 'Pending', // 'Verified', 'Pending', 'Required'
+    lastAuditDate: new Date(2025, 8, 15) // Sept 15, 2025
+  }
 });
 
 // 2. Fuel energy densities and CO2 emission factors
@@ -115,6 +149,9 @@ function simulateRealTimeData() {
   // Update total credits
   plantState.co2Credits += plantState.co2CreditsChange / 1800; // Divide by 1800 for 2-second intervals
   
+  // Calculate region-specific regulatory metrics
+  updateRegulatoryMetrics(totalPowerOutput, totalCO2Output);
+  
   // Increment uptime by 2 seconds
   plantState.uptime += 2 / 3600; // Convert seconds to hours
   
@@ -129,6 +166,51 @@ function simulateRealTimeData() {
     plantState.history.realTime.timestamps.shift();
     plantState.history.realTime.powerOutput.shift();
     plantState.history.realTime.co2Impact.shift();
+  }
+}
+
+// 3.5 Update regulatory metrics based on region
+function updateRegulatoryMetrics(totalPowerOutput, totalCO2Output) {
+  // Calculate CO2 emissions per MWh (common metric)
+  if (totalPowerOutput > 0) {
+    plantState.regulatory.co2EmissionsPerMWh = (totalCO2Output * 3600) / totalPowerOutput; // kg CO2 per MWh
+  }
+  
+  // Region-specific calculations
+  switch (plantState.region) {
+    case 'EU':
+      // EU: Track EUA consumption based on emissions
+      if (totalCO2Output > 0) {
+        const euaConsumptionRate = (totalCO2Output * 3.6) / 1000; // tons CO2 per hour
+        plantState.regulatory.euAllowances.remaining = Math.max(0, 
+          plantState.regulatory.euAllowances.remaining - (euaConsumptionRate / 1800)
+        );
+        plantState.regulatory.euAllowances.surrendered += euaConsumptionRate / 1800;
+      }
+      break;
+      
+    case 'China':
+      // China: Check efficiency benchmarks
+      plantState.regulatory.efficiency.actual = Math.abs(plantState.regulatory.co2EmissionsPerMWh);
+      if (plantState.regulatory.efficiency.actual > plantState.regulatory.efficiency.benchmark) {
+        const excessEmissions = plantState.regulatory.efficiency.actual - plantState.regulatory.efficiency.benchmark;
+        plantState.regulatory.efficiency.extraAllowancesRequired = 
+          (excessEmissions * totalPowerOutput) / 1000; // tons CO2 excess per hour
+      } else {
+        plantState.regulatory.efficiency.extraAllowancesRequired = 0;
+      }
+      break;
+      
+    case 'US':
+      // US: Update carbon credits based on emissions
+      if (totalCO2Output > 0) {
+        const creditConsumptionRate = (totalCO2Output * 3.6) / 1000; // tons CO2 per hour
+        plantState.regulatory.carbonCredits.remaining = Math.max(0,
+          plantState.regulatory.carbonCredits.remaining - (creditConsumptionRate / 1800)
+        );
+        plantState.regulatory.carbonCredits.surrendered += creditConsumptionRate / 1800;
+      }
+      break;
   }
 }
 

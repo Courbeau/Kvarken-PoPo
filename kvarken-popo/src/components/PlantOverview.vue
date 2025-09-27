@@ -166,7 +166,7 @@ const totalPower = computed(() => plantState.totalPower);
 }
 
 .status-indicator.standby {
-  background: linear-gradient(135deg, #ed8936, #dd6b20);
+  background: linear-gradient(135deg, #edc836, #ddb720);
 }
 
 .status-indicator.maintenance {
