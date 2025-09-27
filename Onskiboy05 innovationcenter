@@ -1,17 +1,35 @@
-EU: 
-Large plants (>20 MW) must track emissions per installation.
-Must surrender EU Allowances (EUAs) equal to verified CO₂. = must buy same amount of carbon credits that have been emitted
-Reports are audited and standardized. = report must be detailed and data must be proved via (data from engines etc.)
-Small plants → voluntary reporting only. = not mandatory, but beneficial in the case of Wärtsilä to achieve carbon neutrality 
+EU
 
-China:
-Emissions are reported as CO₂ per MWh (intensity). =
-Plants must meet benchmarks; inefficient plants buy extra allowances. = stay efficient or buy carbon allowances
-CCER offsets allowed for a small part (~5%). = not required but 95% of CO2 offset required. 5% CCER offsets optional but beneficial because it allows to support green projects.
-Verification by provincial authorities. = Local authorities verify data of emissions report
+If country = EU:
 
-US:
-Federal reporting mostly voluntary. = Voluntary, but beneficial for every company.
-Some states (California, RGGI) → mandatory cap-and-trade. = large plants required to offset carbon emissions with carbon credits
-Voluntary reporting/credits for other states. = Smaller plants or plants outside regulated states can report emissions voluntarily and buy voluntary credits if desired.
-Companies must track CO₂ and power generation to meet ESG or state obligations. = Depends heavily on the state in which the power plant is in. Platform could have a dedicated state selector (ehkä).
+Include CO₂ emissions per installation.
+
+Include number of EU Allowances (EUAs) purchased/surrendered.
+
+Include detailed fuel and engine data for verification.
+
+If plant < 20 MW → generate optional voluntary carbon neutrality report.
+
+China
+
+If country = China:
+
+Include CO₂ emissions per MWh (intensity).
+
+Check if plant meets efficiency benchmarks; if not, calculate extra allowances required.
+
+Optionally include CCER offsets (up to 5%).
+
+Include verification info from provincial authorities.
+
+US
+
+If country = US:
+
+Include CO₂ emissions per plant.
+
+Include power generation output.
+
+If plant is in a cap-and-trade state → include carbon credits purchased/surrendered.
+
+If outside regulated states → include optional voluntary ESG/credits reporting.
