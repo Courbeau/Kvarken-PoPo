@@ -1,531 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Energy Forecast & Fuel Optimizer — Demo</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <!-- Kaaviot (valinnainen). Jos tämä ei lataudu, sovellus silti toimii. -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <style>
-    :root { --bg:#0e0e0e; --card:#151515; --muted:#9aa0a6; --text:#f5f5f5; --accent:#4f46e5; --good:#10b981; --bad:#ef4444; --warn:#f59e0b; }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    header{padding:24px 20px;border-bottom:1px solid #232323;position:sticky;top:0;background:rgba(14,14,14,.85);backdrop-filter:blur(8px);z-index:5}
-    h1{font-size:22px;margin:0 0 6px;font-weight:800}
-    header p{margin:0;color:var(--muted)}
-    .wrap{max-width:1200px;margin:0 auto;padding:20px;display:grid;grid-template-columns:360px 1fr;gap:18px}
-    .card{background:var(--card);border:1px solid #232323;border-radius:16px;padding:16px}
-    .card h2{margin:0 0 10px;font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:#cbd5e1}
-    label{display:block;font-size:12px;color:#cbd5e1;margin:10px 0 6px}
-    input, select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #2c2c2c;background:#0f0f0f;color:#fff}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-    .muted{color:var(--muted);font-size:12px}
-    .btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);padding:10px 12px;border-radius:10px;border:none;color:#fff;font-weight:600;cursor:pointer}
-    .btn.secondary{background:#202124}
-    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .kpi{display:grid;gap:8px}
-    .kpi .val{font-size:22px;font-weight:800}
-    .kpi small{color:var(--muted)}
-    .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;border:1px solid #2b2b2b}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid #232323;text-align:right}
-    th:first-child,td:first-child{text-align:left}
-    .good{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)}
-    footer{max-width:1200px;margin:10px auto 40px;color:var(--muted);padding:0 20px}
-    @media (max-width:980px){.wrap{grid-template-columns:1fr}}
-    canvas{height:320px !important}
-    .alert{margin-top:10px; padding:10px 12px; border:1px solid #3a2f12; background:#1a1406; color:#f1c76a; border-radius:10px; font-size:13px}
-    .note{margin-top:10px; padding:10px 12px; border:1px solid #243647; background:#0c1116; color:#9cc6ff; border-radius:10px; font-size:13px}
-    .subtle{margin-top:6px; font-size:12px; color:var(--muted)}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Energy Optimizer — Simple</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0e0e0e;--card:#151515;--muted:#9aa0a6;--text:#f5f5f5;--accent:#4f46e5}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  header{padding:20px;border-bottom:1px solid #232323}
+  h1{margin:0;font-size:20px;font-weight:800}
+  .wrap{max-width:1100px;margin:0 auto;padding:16px;display:grid;gap:12px;grid-template-columns:360px 1fr}
+  .card{background:var(--card);border:1px solid #232323;border-radius:14px;padding:14px}
+  label{display:block;font-size:12px;color:#cbd5e1;margin:8px 0 4px}
+  input,select{width:100%;padding:9px 11px;border-radius:10px;border:1px solid #2c2c2c;background:#0f0f0f;color:#fff}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 12px;font-weight:600;cursor:pointer}
+  table{width:100%;border-collapse:collapse;margin-top:6px}
+  th,td{padding:8px 6px;border-bottom:1px solid #232323;text-align:right;font-size:14px}
+  th:first-child,td:first-child{text-align:left}
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{background:#0f0f0f;border:1px solid #232323;border-radius:10px;padding:10px}
+  .kpi .val{font-size:18px;font-weight:800}
+  .muted{color:var(--muted);font-size:12px;margin-top:4px}
+  @media (max-width:980px){.wrap{grid-template-columns:1fr}}
+  canvas{height:320px !important}
+</style>
 </head>
 <body>
-  <header>
-    <h1>Energy Forecast & Fuel Optimizer</h1>
-    <p>Simple demo model that forecasts demand and schedules engines on Hydrogen vs. Diesel to minimize net cost and maximize carbon credits.</p>
-  </header>
+<header><h1>Energy Optimizer — Simple</h1></header>
 
-  <main class="wrap">
-    <!-- Controls -->
-    <section class="card" id="controls">
-      <h2>Inputs</h2>
+<main class="wrap">
+  <!-- Inputs -->
+  <section class="card">
+    <h2 style="margin:0 0 8px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:#cbd5e1">Inputs</h2>
 
-      <label>Where is your plant located?</label>
-      <select id="region">
-        <option value="EU">EU</option>
-        <option value="USA">USA</option>
-        <option value="CHN">China</option>
-      </select>
+    <label>Horizon</label>
+    <select id="horizon">
+      <option value="24">24 h</option>
+      <option value="168">7 d</option>
+      <option value="720">30 d</option>
+    </select>
 
-      <label>Forecast horizon</label>
-      <select id="horizon">
-        <option value="24">24 hours (hourly)</option>
-        <option value="168">7 days (hourly)</option>
-        <option value="720">30 days (hourly)</option>
-      </select>
-
-      <div class="row">
-        <div>
-          <label>Engines (count)</label>
-          <input id="engines" type="number" min="1" value="6" />
-        </div>
-        <div>
-          <label>Max power per engine (MW)</label>
-          <input id="pMax" type="number" step="0.1" min="0" value="8" />
-        </div>
+    <div class="row">
+      <div>
+        <label>Engines (count)</label>
+        <input id="engines" type="number" min="1" value="6" />
       </div>
-
-      <div class="row">
-        <div>
-          <label>Base demand (MW)</label>
-          <input id="baseDemand" type="number" step="0.1" value="30" />
-        </div>
-        <div>
-          <label>Demand amplitude (MW)</label>
-          <input id="ampDemand" type="number" step="0.1" value="12" />
-        </div>
+      <div>
+        <label>Max power per engine (MW)</label>
+        <input id="pMax" type="number" step="0.1" min="0" value="8" />
       </div>
+    </div>
 
-      <div class="row">
-        <div>
-          <label>Base power price (€/MWh)</label>
-          <input id="basePrice" type="number" step="1" value="90" />
-        </div>
-        <div>
-          <label>Price amplitude (€/MWh)</label>
-          <input id="ampPrice" type="number" step="1" value="40" />
-        </div>
+    <div class="row">
+      <div>
+        <label>Base demand (MW)</label>
+        <input id="baseDemand" type="number" step="0.1" value="30" />
       </div>
-
-      <div class="row">
-        <div>
-          <label>Carbon price (€/tCO₂)</label>
-          <input id="carbonPrice" type="number" step="1" value="85" />
-        </div>
-        <div>
-          <label>Credit baseline</label>
-          <select id="creditBaseline">
-            <option value="diesel">Avoided vs Diesel</option>
-            <option value="none">No credits</option>
-          </select>
-        </div>
+      <div>
+        <label>Demand amplitude (MW)</label>
+        <input id="ampDemand" type="number" step="0.1" value="12" />
       </div>
+    </div>
 
-      <div class="card" style="margin-top:12px">
-        <h2>Fuel A — Hydrogen (clean)</h2>
-        <div class="row3">
-          <div>
-            <label>Price (€/kg)</label>
-            <input id="h2Price" type="number" step="0.1" value="6" />
-          </div>
-          <div>
-            <label>LHV (MJ/kg)</label>
-            <input id="h2LHV" type="number" step="1" value="120" />
-          </div>
-          <div>
-            <label>Electric efficiency (%)</label>
-            <input id="h2Eff" type="number" step="0.1" value="45" />
-          </div>
-        </div>
-        <div class="row">
-          <div>
-            <label>Direct CO₂ factor (kg/MJ)</label>
-            <input id="h2CO2" type="number" step="0.001" value="0" />
-          </div>
-          <div>
-            <span class="pill">Credits if baseline is Diesel</span>
-          </div>
-        </div>
+    <label>Carbon price (€/tCO₂)</label>
+    <input id="carbonPrice" type="number" step="1" value="85" />
+
+    <label>Credit baseline</label>
+    <select id="creditBaseline">
+      <option value="diesel">Avoided vs Diesel</option>
+      <option value="none">No credits</option>
+    </select>
+
+    <div class="card" style="margin-top:10px">
+      <h3 style="margin:0 0 6px;font-size:13px;color:#cbd5e1;text-transform:uppercase">Hydrogen (H₂)</h3>
+      <div class="row3">
+        <div><label>Price (€/kg)</label><input id="h2Price" type="number" step="0.1" value="6" /></div>
+        <div><label>LHV (MJ/kg)</label><input id="h2LHV" type="number" step="1" value="120" /></div>
+        <div><label>Electric efficiency (%)</label><input id="h2Eff" type="number" step="0.1" value="45" /></div>
       </div>
+      <label>Direct CO₂ factor (kg/MJ)</label>
+      <input id="h2CO2" type="number" step="0.001" value="0" />
+    </div>
 
-      <div class="card" style="margin-top:12px">
-        <h2>Fuel B — Diesel (dirty)</h2>
-        <div class="row3">
-          <div>
-            <label>Price (€/kg)</label>
-            <input id="dPrice" type="number" step="0.01" value="1.2" />
-          </div>
-          <div>
-            <label>LHV (MJ/kg)</label>
-            <input id="dLHV" type="number" step="0.1" value="43" />
-          </div>
-          <div>
-            <label>Electric efficiency (%)</label>
-            <input id="dEff" type="number" step="0.1" value="42" />
-          </div>
-        </div>
-        <div class="row">
-          <div>
-            <label>Direct CO₂ factor (kg/MJ)</label>
-            <input id="dCO2" type="number" step="0.001" value="0.074" />
-          </div>
-          <div>
-            <span class="pill">No credits for Diesel</span>
-          </div>
-        </div>
+    <div class="card" style="margin-top:10px">
+      <h3 style="margin:0 0 6px;font-size:13px;color:#cbd5e1;text-transform:uppercase">Diesel</h3>
+      <div class="row3">
+        <div><label>Price (€/kg)</label><input id="dPrice" type="number" step="0.01" value="1.2" /></div>
+        <div><label>LHV (MJ/kg)</label><input id="dLHV" type="number" step="0.1" value="43" /></div>
+        <div><label>Electric efficiency (%)</label><input id="dEff" type="number" step="0.1" value="42" /></div>
       </div>
+      <label>Direct CO₂ factor (kg/MJ)</label>
+      <input id="dCO2" type="number" step="0.001" value="0.074" />
+    </div>
 
-      <!-- TÄRKEÄ: oletuksena pakotettu tuotanto, jotta arvot eivät jää nollaksi -->
-      <label>Dispatch rule</label>
-      <select id="dispatchRule">
-        <option value="must" selected>Always meet demand (use cheapest fuel)</option>
-        <option value="profit">Profit-based (run only if price ≥ marginal cost)</option>
-      </select>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn" id="runBtn">Calculate</button>
+      <button class="btn" style="background:#202124" id="seedBtn">New demand</button>
+    </div>
+    <p class="muted">Dispatch: each hour we meet demand (up to capacity) with the lower marginal cost (€/MWh). Credits accrue only to H₂ when baseline = Diesel.</p>
+  </section>
 
-      <div style="display:flex;gap:8px;margin-top:12px">
-        <button class="btn" id="runBtn">Run optimizer</button>
-        <button class="btn secondary" id="seedBtn">Reroll demand/price pattern</button>
-      </div>
-      <div id="msg"></div>
-      <p class="muted" style="margin-top:8px">Logic: we generate hourly demand & price with simple seasonality. Either always cover demand with cheapest fuel (default), or run only when price ≥ marginal cost (fuel + carbon − credits).</p>
-    </section>
+  <!-- Output -->
+  <section class="card">
+    <h2 style="margin:0 0 8px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:#cbd5e1">Demand & Forecast</h2>
+    <div class="card" style="padding:10px"><canvas id="chart"></canvas></div>
 
-    <!-- Output -->
-    <section class="card">
-      <h2>Forecast & Dispatch</h2>
-      <div class="grid2">
-        <div class="card" style="padding:12px"><canvas id="chartDemand"></canvas></div>
-        <div class="card" style="padding:12px"><canvas id="chartDispatch"></canvas></div>
-      </div>
+    <div class="kpis" style="margin-top:10px">
+      <div class="kpi"><div class="val" id="kpiEnergy">0 MWh</div><div class="muted">Energy generated</div></div>
+      <div class="kpi"><div class="val" id="kpiEmissions">0 tCO₂</div><div class="muted">Direct emissions</div></div>
+      <div class="kpi"><div class="val" id="kpiCreditsH2">€0</div><div class="muted">Carbon credits — H₂</div></div>
+      <div class="kpi"><div class="val" id="kpiCreditsD">€0</div><div class="muted">Carbon credits — Diesel</div></div>
+    </div>
 
-      <div class="grid2" style="margin-top:12px">
-        <div class="card">
-          <h2>KPIs (Total over horizon)</h2>
-          <div class="row">
-            <div class="kpi"><div class="val" id="kpiEnergy">0 MWh</div><small>Energy generated</small></div>
-            <div class="kpi"><div class="val" id="kpiRevenue">€0</div><small>Power revenue</small></div>
-          </div>
-          <div class="row" style="margin-top:6px">
-            <div class="kpi"><div class="val" id="kpiFuelCost">€0</div><small>Fuel cost</small></div>
-            <div class="kpi"><div class="val" id="kpiCredits">€0</div><small>Carbon credits (total)</small></div>
-          </div>
-          <div class="row" style="margin-top:6px">
-            <div class="kpi"><div class="val" id="kpiEmissions">0 tCO₂</div><small>Direct emissions</small></div>
-            <div class="kpi"><div class="val" id="kpiNet">€0</div><small>Net margin (rev − fuel + credits)</small></div>
-          </div>
-          <div class="subtle">Credits by fuel: H₂ <span id="h2CreditsTotal">€0</span> • Diesel <span id="dCreditsTotal">€0</span></div>
-        </div>
-
-        <div class="card">
-          <h2>Fuel Split & Intensities</h2>
-          <table>
-            <thead><tr><th>Metric</th><th>Hydrogen</th><th>Diesel</th></tr></thead>
-            <tbody>
-              <tr><td>Energy (MWh)</td><td id="h2E">0</td><td id="dE">0</td></tr>
-              <tr><td>Fuel (kg)</td><td id="h2Kg">0</td><td id="dKg">0</td></tr>
-              <tr><td>Emissions (gCO₂/kWh)</td><td id="h2Int">0</td><td id="dInt">0</td></tr>
-              <tr><td class="muted" colspan="3">— Per-fuel economics (€/MWh) —</td></tr>
-              <tr><td>Fuel cost</td><td id="h2FuelEurMWh">0</td><td id="dFuelEurMWh">0</td></tr>
-              <tr><td>Carbon cost</td><td id="h2CarbonEurMWh">0</td><td id="dCarbonEurMWh">0</td></tr>
-              <tr><td>Credits</td><td id="h2CreditEurMWh">0</td><td id="dCreditEurMWh">0</td></tr>
-              <tr><td>Marginal cost</td><td id="h2MC">0</td><td id="dMC">0</td></tr>
-            </tbody>
-          </table>
-          <p class="muted">Intensities from direct factors. Credits shown per MWh and totals per fuel; credits accrue only to H₂ when baseline is Diesel.</p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <p>Demo only — simplified physics & markets. Adjust parameters to fit your plant. © Your Project</p>
-  </footer>
+    <div class="card" style="margin-top:10px">
+      <h3 style="margin:0 0 6px;font-size:13px;color:#cbd5e1;text-transform:uppercase">Fuel comparison</h3>
+      <table>
+        <thead><tr><th>Metric</th><th>Hydrogen</th><th>Diesel</th></tr></thead>
+        <tbody>
+          <tr><td>Energy (MWh)</td><td id="h2E">0</td><td id="dE">0</td></tr>
+          <tr><td>Fuel (kg)</td><td id="h2Kg">0</td><td id="dKg">0</td></tr>
+          <tr><td>Fuel cost (€/MWh)</td><td id="h2Fuel">0.00</td><td id="dFuel">0.00</td></tr>
+          <tr><td>Carbon cost (€/MWh)</td><td id="h2Carbon">0.00</td><td id="dCarbon">0.00</td></tr>
+          <tr><td>Credits (€/MWh)</td><td id="h2Cred">0.00</td><td id="dCred">0.00</td></tr>
+          <tr><td>Marginal cost (€/MWh)</td><td id="h2MC">0.00</td><td id="dMC">0.00</td></tr>
+          <tr><td>Emissions (gCO₂/kWh)</td><td id="h2Int">0</td><td id="dInt">0</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">€/MWh values come directly from inputs and are comparable at a glance.</p>
+    </div>
+  </section>
+</main>
 
 <script>
 (function(){
-  // -------- Utilities --------
-  let noiseSeed = 1; // vaihtuu "Rerollilla"
-  function rand(){            // deterministinen PRNG, käyttää noiseSeed-arvoa
-    noiseSeed = (noiseSeed*9301 + 49297) % 233280;
-    return noiseSeed / 233280;
-  }
+  // ------- Utilities -------
+  let seed = 1;
+  function rand(){ seed = (seed*9301 + 49297) % 233280; return seed/233280; }
+  const el = id => document.getElementById(id);
   const fmtEUR = n => '€' + (n).toLocaleString(undefined,{maximumFractionDigits:0});
-  const fmtEUR2 = n => '€' + (n).toLocaleString(undefined,{maximumFractionDigits:2});
   const fmtMWh = n => (n).toLocaleString(undefined,{maximumFractionDigits:0}) + ' MWh';
   const fmtTons = n => (n).toLocaleString(undefined,{maximumFractionDigits:2}) + ' tCO₂';
 
-  const el = id => document.getElementById(id);
-  const horizonSel = el('horizon');
-  const regionSel  = el('region');
-  const dispatchRuleSel = el('dispatchRule');
-  const msgBox = el('msg');
-
+  // ------- Inputs -------
   const inputs = {
-    engines: el('engines'), pMax: el('pMax'), baseDemand: el('baseDemand'), ampDemand: el('ampDemand'),
-    basePrice: el('basePrice'), ampPrice: el('ampPrice'), carbonPrice: el('carbonPrice'), creditBaseline: el('creditBaseline'),
+    horizon: el('horizon'),
+    engines: el('engines'), pMax: el('pMax'),
+    baseDemand: el('baseDemand'), ampDemand: el('ampDemand'),
+    carbonPrice: el('carbonPrice'), creditBaseline: el('creditBaseline'),
     h2Price: el('h2Price'), h2LHV: el('h2LHV'), h2Eff: el('h2Eff'), h2CO2: el('h2CO2'),
     dPrice: el('dPrice'), dLHV: el('dLHV'), dEff: el('dEff'), dCO2: el('dCO2')
   };
 
-  // -------- Region presets (demo) --------
-  const regionPresets = {
-    EU : { carbon:85, credit:'diesel', basePrice:90, ampPrice:40 },
-    USA: { carbon:20, credit:'none',   basePrice:80, ampPrice:35 },
-    CHN: { carbon:10, credit:'none',   basePrice:70, ampPrice:30 }
-  };
-  function applyRegionPreset(){
-    const r = regionPresets[regionSel.value] || regionPresets.EU;
-    inputs.carbonPrice.value   = r.carbon;
-    inputs.creditBaseline.value= r.credit;
-    inputs.basePrice.value     = r.basePrice;
-    inputs.ampPrice.value      = r.ampPrice;
-  }
-
-  // -------- Series generation --------
-  function genSeries(hours){
-    const demand = [], price = [], labels = [];
+  // ------- Series: demand & forecast (sine) -------
+  function genDemand(hours){
+    const demand=[], forecast=[], labels=[];
     for(let t=0;t<hours;t++){
-      const dayFrac = (t%24)/24;
-      const weekFrac = (t%168)/168;
-      const demandVal = Number(inputs.baseDemand.value)
-        + Number(inputs.ampDemand.value)*Math.sin(2*Math.PI*dayFrac)
-        + 2*Math.sin(2*Math.PI*weekFrac)
-        + (rand()-0.5)*2; // melu
-      const priceVal = Number(inputs.basePrice.value)
-        + Number(inputs.ampPrice.value)*Math.sin(2*Math.PI*dayFrac+0.7)
-        + 5*Math.sin(2*Math.PI*weekFrac+1.2)
-        + (rand()-0.5)*4;
-      demand.push(Math.max(0, demandVal));
-      price.push(Math.max(0, priceVal));
+      const day = (t%24)/24;
+      const base = Number(inputs.baseDemand.value);
+      const amp  = Number(inputs.ampDemand.value);
+      const f = base + amp*Math.sin(2*Math.PI*day); // pure sine forecast
+      const d = f + (rand()-0.5)*2 + 2*Math.sin(2*Math.PI*((t%168)/168)); // forecast + noise + weekly seasonality
+      demand.push(Math.max(0,d));
+      forecast.push(Math.max(0,f));
       labels.push('t+'+t+'h');
     }
-    return {demand, price, labels};
+    return {demand, forecast, labels};
   }
 
-  // -------- Physics / economics helpers --------
-  const kgForMWh = (mwh, lhv, effPct) => (mwh*3600)/(lhv*(effPct/100));
-  const kgCO2FromFuel = (kgFuel, lhv, kgCO2perMJ) => kgFuel*lhv*kgCO2perMJ;
+  // ------- Physics/Economics -------
+  const kgForMWh = (mwh, lhv, effPct) => (mwh*3600)/(lhv*(effPct/100));   // kg fuel / MWh_e
+  const kgCO2FromFuel = (kgFuel, lhv, kgCO2perMJ) => kgFuel*lhv*kgCO2perMJ; // kgCO2
 
-  function perMWhParts(fuel){
-    // Polttoainekohtainen €/MWh-erittely (ei riipu sähkön hinnasta)
-    const kgPerMWh = kgForMWh(1, fuel.lhv, fuel.eff);
-    const fuelCost = kgPerMWh * fuel.price; // €/MWh
-    const directEmissionsKg = kgCO2FromFuel(kgPerMWh, fuel.lhv, fuel.co2); // kg/MWh
-    const carbonCost = (directEmissionsKg/1000) * Number(inputs.carbonPrice.value); // €/MWh
-
-    let creditPerMWh = 0;
-    if(inputs.creditBaseline.value === 'diesel' && fuel.name === 'Hydrogen'){
+  function perMWh(f){
+    const kgPerMWh = kgForMWh(1, f.lhv, f.eff);
+    const fuelCost = kgPerMWh * f.price;
+    const directKg = kgCO2FromFuel(kgPerMWh, f.lhv, f.co2);
+    const carbonCost = (directKg/1000) * Number(inputs.carbonPrice.value);
+    let credit = 0;
+    if(inputs.creditBaseline.value==='diesel' && f.name==='Hydrogen'){
       const kgPerMWhDiesel = kgForMWh(1, Number(inputs.dLHV.value), Number(inputs.dEff.value));
-      const dieselKg = kgCO2FromFuel(kgPerMWhDiesel, Number(inputs.dLHV.value), Number(inputs.dCO2.value)); // kg/MWh
-      const avoidedKg = Math.max(0, dieselKg - directEmissionsKg);
-      creditPerMWh = (avoidedKg/1000) * Number(inputs.carbonPrice.value);
+      const dieselKg = kgCO2FromFuel(kgPerMWhDiesel, Number(inputs.dLHV.value), Number(inputs.dCO2.value));
+      credit = Math.max(0, (dieselKg - directKg)/1000 * Number(inputs.carbonPrice.value));
     }
-    const marginalCost = fuelCost + carbonCost - creditPerMWh; // €/MWh
-    return {kgPerMWh, fuelCost, carbonCost, creditPerMWh, marginalCost, directEmissionsKg};
+    const mc = fuelCost + carbonCost - credit;
+    return {kgPerMWh, fuelCost, carbonCost, credit, mc, directKg};
   }
 
-  function netCostParts(priceEURperMWh, fuel){
-    // Käytetään päätöksentekoon tuntitasolla (riippuu hinnasta vain "net" osalta)
-    const p = perMWhParts(fuel);
-    const net = (p.marginalCost - priceEURperMWh); // negatiivinen = kannattava
-    return {net, ...p};
-  }
-
-  // -------- Optimizer --------
+  // ------- Dispatch: meet demand with cheaper marginal cost -------
   function optimize(hours){
-    const {demand, price, labels} = genSeries(hours);
+    const {demand, forecast, labels} = genDemand(hours);
     const capMW = Number(inputs.engines.value) * Number(inputs.pMax.value);
 
-    const H2 = {name:'Hydrogen', price:Number(inputs.h2Price.value), lhv:Number(inputs.h2LHV.value), eff:Number(inputs.h2Eff.value), co2:Number(inputs.h2CO2.value)};
-    const D  = {name:'Diesel',   price:Number(inputs.dPrice.value),  lhv:Number(inputs.dLHV.value),  eff:Number(inputs.dEff.value),  co2:Number(inputs.dCO2.value)};
+    const H2 = {name:'Hydrogen', price:+inputs.h2Price.value, lhv:+inputs.h2LHV.value, eff:+inputs.h2Eff.value, co2:+inputs.h2CO2.value};
+    const D  = {name:'Diesel',   price:+inputs.dPrice.value,  lhv:+inputs.dLHV.value,  eff:+inputs.dEff.value,  co2:+inputs.dCO2.value};
+
+    const cH2 = perMWh(H2), cD = perMWh(D);
 
     const out = {
-      labels, demand, price,
-      dispatchH2:[], dispatchD:[],
-      energy:0, energyH2:0, energyD:0,
-      fuelKgH2:0, fuelKgD:0,
-      costFuel:0, costFuelH2:0, costFuelD:0,
-      rev:0, credits:0, creditsH2:0, creditsD:0,
-      co2kg:0, co2kgH2:0, co2kgD:0,
-      profitableHours:0,
-      // per-fuel €/MWh snapshot (inputista)
-      perMWh:{
-        H2: perMWhParts(H2),
-        D:  perMWhParts(D)
-      }
+      labels, demand, forecast, per:{H2:cH2, D:cD},
+      eH2:0, eD:0, kgH2:0, kgD:0, creditsH2:0, creditsD:0, co2kg:0, energy:0
     };
 
-    const mustServe = (dispatchRuleSel.value === 'must');
-
     for(let t=0;t<hours;t++){
-      const p = price[t];
-      const mH2 = netCostParts(p, H2);
-      const mD  = netCostParts(p, D);
+      const need = Math.min(demand[t], capMW); // MWh in the hour
+      const useH2 = (cH2.mc <= cD.mc);
+      const chosen = useH2 ? {c:cH2, f:H2} : {c:cD, f:D};
 
-      let chosen, profitable=false;
-      if(mustServe){
-        chosen = (mH2.marginalCost <= mD.marginalCost) ? {fuel:H2, m:mH2} : {fuel:D, m:mD};
-        profitable = (p >= chosen.m.marginalCost);
-      } else {
-        chosen = (mH2.net <= mD.net) ? {fuel:H2, m:mH2} : {fuel:D, m:mD};
-        profitable = (chosen.m.net < 0);
-      }
+      const kg = kgForMWh(need, chosen.f.lhv, chosen.f.eff);
+      const co2 = kgCO2FromFuel(kg, chosen.f.lhv, chosen.f.co2);
+      const cred = useH2 ? (cH2.credit * need) : 0;
 
-      const runMW = mustServe ? Math.min(demand[t], capMW) : (profitable ? Math.min(demand[t], capMW) : 0);
-      const runMWh = runMW;
-
-      const kg = kgForMWh(runMWh, chosen.fuel.lhv, chosen.fuel.eff);
-      const fuelCost = kg * chosen.fuel.price;
-      const co2 = kgCO2FromFuel(kg, chosen.fuel.lhv, chosen.fuel.co2);
-
-      let creditEUR = 0;
-      if(inputs.creditBaseline.value === 'diesel' && chosen.fuel.name==='Hydrogen'){
-        const kgPerMWhDiesel = kgForMWh(1, D.lhv, D.eff);
-        const dieselKg = kgCO2FromFuel(kgPerMWhDiesel*runMWh, D.lhv, D.co2);
-        creditEUR = Math.max(0, (dieselKg - co2)/1000 * Number(inputs.carbonPrice.value));
-      }
-
-      out.energy += runMWh;
-      out.rev += runMWh * p;
-      out.costFuel += fuelCost;
-      out.credits += creditEUR;
+      out.energy += need;
       out.co2kg += co2;
 
-      if(chosen.fuel.name==='Hydrogen'){
-        out.dispatchH2.push(runMW); out.dispatchD.push(0);
-        out.fuelKgH2 += kg; out.costFuelH2 += fuelCost; out.energyH2 += runMWh; out.co2kgH2 += co2; out.creditsH2 += creditEUR;
-      } else {
-        out.dispatchH2.push(0); out.dispatchD.push(runMW);
-        out.fuelKgD += kg; out.costFuelD += fuelCost; out.energyD += runMWh; out.co2kgD += co2; out.creditsD += 0; // Diesel ei saa krediittejä
+      if(useH2){
+        out.eH2 += need; out.kgH2 += kg; out.creditsH2 += cred;
+      }else{
+        out.eD  += need; out.kgD  += kg; out.creditsD  += 0;
       }
-
-      if(!mustServe && runMWh>0 && profitable) out.profitableHours++;
     }
     return out;
   }
 
-  // -------- Charts (robust) --------
-  let demandChart, dispatchChart;
-  function safeDestroy(c){ try{ c && c.destroy && c.destroy(); }catch(e){} }
+  // ------- UI render -------
+  let chart;
+  function draw(res){
+    // KPIs
+    el('kpiEnergy').textContent = fmtMWh(res.energy);
+    el('kpiEmissions').textContent = fmtTons(res.co2kg/1000);
+    el('kpiCreditsH2').textContent = fmtEUR(res.creditsH2);
+    el('kpiCreditsD').textContent  = fmtEUR(res.creditsD);
 
-  function drawCharts(res){
-    const hasChart = (typeof window.Chart !== 'undefined');
-    const ctx1 = document.getElementById('chartDemand');
-    const ctx2 = document.getElementById('chartDispatch');
+    // Fuel table
+    el('h2E').textContent = res.eH2.toFixed(0);
+    el('dE').textContent  = res.eD.toFixed(0);
+    el('h2Kg').textContent = res.kgH2.toFixed(0);
+    el('dKg').textContent  = res.kgD.toFixed(0);
+    el('h2Fuel').textContent   = res.per.H2.fuelCost.toFixed(2);
+    el('dFuel').textContent    = res.per.D.fuelCost.toFixed(2);
+    el('h2Carbon').textContent = res.per.H2.carbonCost.toFixed(2);
+    el('dCarbon').textContent  = res.per.D.carbonCost.toFixed(2);
+    el('h2Cred').textContent   = res.per.H2.credit.toFixed(2);
+    el('dCred').textContent    = res.per.D.credit.toFixed(2);
+    el('h2MC').textContent     = res.per.H2.mc.toFixed(2);
+    el('dMC').textContent      = res.per.D.mc.toFixed(2);
+    const h2Int = (res.per.H2.directKg/1000)*1e6; // g/kWh
+    const dInt  = (res.per.D.directKg/1000)*1e6;
+    el('h2Int').textContent = h2Int.toFixed(0);
+    el('dInt').textContent  = dInt.toFixed(0);
 
-    safeDestroy(demandChart); safeDestroy(dispatchChart);
-
-    if(!hasChart){
-      if(!document.getElementById('chart-note')){
-        const n = document.createElement('div');
-        n.className = 'note';
-        n.id = 'chart-note';
-        n.innerHTML = 'Charts are disabled (Chart.js not loaded). KPIs and tables still work.';
-        document.querySelector('section.card#controls').appendChild(n);
-      }
-      return;
-    }
-
-    try{
-      demandChart = new Chart(ctx1, {
-        type:'line', data:{
-          labels: res.labels,
-          datasets:[
-            {label:'Demand (MW)', data:res.demand, borderWidth:2, tension:0.25, fill:true},
-            {label:'Avg power price (€/MWh)', data:res.price, borderDash:[6,6], yAxisID:'y1', borderWidth:2, tension:0.25}
-          ]
-        }, options:{
-          responsive:true, maintainAspectRatio:false, scales:{
-            y:{title:{display:true,text:'MW'}},
-            y1:{position:'right', grid:{drawOnChartArea:false}, title:{display:true,text:'€/MWh'}}
-          }, plugins:{legend:{labels:{color:'#e5e7eb'}}}
-        }
-      });
-
-      dispatchChart = new Chart(ctx2,{
-        type:'bar', data:{ labels:res.labels, datasets:[
-          {label:'Hydrogen Dispatch (MW)', data:res.dispatchH2, stack:'s', borderWidth:0},
-          {label:'Diesel Dispatch (MW)', data:res.dispatchD, stack:'s', borderWidth:0}
-        ]}, options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{title:{display:true,text:'MW'}} } }
-      });
-    }catch(e){
-      if(!document.getElementById('chart-note')){
-        const n = document.createElement('div');
-        n.className = 'note';
-        n.id = 'chart-note';
-        n.innerText = 'Charts failed to render, but the optimizer ran. Check console for errors.';
-        document.querySelector('section.card#controls').appendChild(n);
-      }
-      console.error('Chart error:', e);
-    }
-  }
-
-  // -------- KPI rendering --------
-  function setText(id, txt){ const node = document.getElementById(id); if(node) node.textContent = txt; }
-  function renderKPIs(res){
-    // Kokonais-KPI:t
-    setText('kpiEnergy', fmtMWh(res.energy));
-    setText('kpiRevenue', fmtEUR(res.rev));
-    setText('kpiFuelCost', fmtEUR(res.costFuel));
-    setText('kpiCredits', fmtEUR(res.credits));
-    setText('kpiEmissions', fmtTons(res.co2kg/1000));
-    setText('kpiNet', fmtEUR(res.rev - res.costFuel + res.credits));
-
-    // Polttoainekohtaiset määrät
-    setText('h2E', (res.energyH2).toFixed(0));
-    setText('dE',  (res.energyD).toFixed(0));
-    setText('h2Kg', res.fuelKgH2.toFixed(0));
-    setText('dKg',  res.fuelKgD.toFixed(0));
-
-    // LCOF (vain polttoainekulut / MWh)
-    const h2LCOF = res.energyH2>0 ? (res.costFuelH2 / res.energyH2) : res.perMWh.H2.fuelCost;
-    const dLCOF  = res.energyD>0  ? (res.costFuelD  / res.energyD ) : res.perMWh.D.fuelCost;
-
-    // Intensiteetit
-    const h2Int = res.energyH2>0 ? (res.co2kgH2 / (res.energyH2*1000)) * 1e6 : (res.perMWh.H2.directEmissionsKg/1000)*1e6;
-    const dInt  = res.energyD>0  ? (res.co2kgD  / (res.energyD*1000)) * 1e6 : (res.perMWh.D.directEmissionsKg/1000)*1e6;
-    setText('h2Int', h2Int.toFixed(0));
-    setText('dInt', dInt.toFixed(0));
-
-    // Per-fuel €/MWh-erittely (suoraan inputeista johdetut)
-    setText('h2FuelEurMWh', res.perMWh.H2.fuelCost.toFixed(2));
-    setText('dFuelEurMWh',  res.perMWh.D.fuelCost.toFixed(2));
-    setText('h2CarbonEurMWh', res.perMWh.H2.carbonCost.toFixed(2));
-    setText('dCarbonEurMWh',  res.perMWh.D.carbonCost.toFixed(2));
-    setText('h2CreditEurMWh', res.perMWh.H2.creditPerMWh.toFixed(2));
-    setText('dCreditEurMWh',  res.perMWh.D.creditPerMWh.toFixed(2));
-    setText('h2MC', res.perMWh.H2.marginalCost.toFixed(2));
-    setText('dMC',  res.perMWh.D.marginalCost.toFixed(2));
-
-    // Näytetään LCOF rivillä "Cost (€/MWh)"? (poistettu alkuperäinen rivi — nyt korvattu erittelyllä)
-    // Jos haluat pitää erillisen LCOF-rivin, voit lisätä sen taulukkoon ja syöttää: h2LCOF.toFixed(2), dLCOF.toFixed(2)
-
-    // Krediitit polttoaineittain (yhteensä)
-    setText('h2CreditsTotal', fmtEUR(res.creditsH2));
-    setText('dCreditsTotal', fmtEUR(res.creditsD));
-  }
-
-  function renderMessage(res){
-    msgBox.innerHTML = '';
-    if(dispatchRuleSel.value==='profit' && res.energy<=0){
-      msgBox.innerHTML = `<div class="alert"><strong>No profitable hours.</strong> Price &lt; marginal cost. Try raising price levels, lowering fuel prices/carbon price, enabling Diesel baseline credits, or switch to <em>Always meet demand</em>.</div>`;
-    }
+    // Chart: Demand vs Forecast (sine)
+    if(chart){ chart.destroy(); }
+    const ctx = document.getElementById('chart');
+    chart = new Chart(ctx,{
+      type:'line',
+      data:{
+        labels:res.labels,
+        datasets:[
+          {label:'Demand (MW)', data:res.demand, borderWidth:2, tension:0.25, fill:true},
+          {label:'Forecast (MW)', data:res.forecast, borderWidth:2, borderDash:[6,6], tension:0.25}
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,scales:{y:{title:{display:true,text:'MW'}}}}
+    });
   }
 
   function run(){
-    const hours = Number(horizonSel.value);
+    const hours = Number(inputs.horizon.value);
     const res = optimize(hours);
-    drawCharts(res);
-    renderKPIs(res);
-    renderMessage(res);
+    draw(res);
   }
 
-  // -------- Events --------
+  // Events
   document.getElementById('runBtn').addEventListener('click', run);
-  document.getElementById('seedBtn').addEventListener('click', ()=>{
-    noiseSeed = Math.floor(Math.random()*100000)+1; // oikea reroll
-    run();
-  });
-  regionSel.addEventListener('change', ()=>{ applyRegionPreset(); run(); });
+  document.getElementById('seedBtn').addEventListener('click', ()=>{ seed = Math.floor(Math.random()*100000)+1; run(); });
 
   // Init
-  applyRegionPreset();
   run();
 })();
 </script>
 </body>
 </html>
+
