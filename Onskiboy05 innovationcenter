@@ -1,0 +1,35 @@
+EU
+
+If country = EU:
+
+Include CO₂ emissions per installation.
+
+Include number of EU Allowances (EUAs) purchased/surrendered.
+
+Include detailed fuel and engine data for verification.
+
+If plant < 20 MW → generate optional voluntary carbon neutrality report.
+
+China
+
+If country = China:
+
+Include CO₂ emissions per MWh (intensity).
+
+Check if plant meets efficiency benchmarks; if not, calculate extra allowances required.
+
+Optionally include CCER offsets (up to 5%).
+
+Include verification info from provincial authorities.
+
+US
+
+If country = US:
+
+Include CO₂ emissions per plant.
+
+Include power generation output.
+
+If plant is in a cap-and-trade state → include carbon credits purchased/surrendered.
+
+If outside regulated states → include optional voluntary ESG/credits reporting.
