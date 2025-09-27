@@ -11,6 +11,14 @@ const views = {
 
 // Default to PlantOverview
 const activeView = shallowRef(PlantOverview);
+
+// User/location state
+const location = ref('china');
+const showLocationDropdown = ref(false);
+function setLocation(loc) {
+  location.value = loc;
+  showLocationDropdown.value = false;
+}
 </script>
 
 <template>
@@ -23,9 +31,14 @@ const activeView = shallowRef(PlantOverview);
       </ul>
     </nav>
 
-    <main class="content">
-      <component :is="activeView" />
-    </main>
+    <div class="main-area">
+      <div class="userbox-global">
+        <div class="user-role">Operator</div>
+      </div>
+      <main class="content">
+        <component :is="activeView" />
+      </main>
+    </div>
   </div>
 </template>
 
@@ -38,48 +51,91 @@ const activeView = shallowRef(PlantOverview);
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #f6f8fa;
-  color: #222;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: #2d3748;
+  line-height: 1.6;
+  font-size: 14px;
 }
 
-/* Main Layout using Flexbox */
-/* Main Layout using Flexbox */
+/* Modern Layout */
 #layout {
   display: flex;
   height: 100vh;
-  background: #f6f8fa;
+  background: transparent;
+}
+.main-area {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.userbox-global {
+  position: absolute;
+  top: 24px;
+  right: 48px;
+  background: #fff;
+  color: #222;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  z-index: 100;
+}
+.user-role {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
 }
 
-/* Sidebar */
+/* Modern Sidebar */
 .sidebar {
-  width: 240px;
-  background-color: #e9eef5;
-  padding: 20px;
-  border-right: 1px solid #cfd8dc;
+  width: 280px;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 32px 24px;
+  border-radius: 0 24px 24px 0;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
 }
 
 .sidebar h2 {
-  margin-bottom: 20px;
-  color: #111;
+  margin-bottom: 32px;
+  color: #2d3748;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  text-align: center;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .sidebar button {
   width: 100%;
-  padding: 12px 15px;
-  margin-bottom: 10px;
-  background-color: #fff;
-  color: #222;
-  border: 1px solid #bbb;
-  border-radius: 5px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #4a5568;
+  border: none;
+  border-radius: 16px;
   text-align: left;
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 .sidebar button:hover {
-  background-color: #f0f0f0;
-  color: #000;
+  background: rgba(255, 255, 255, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  color: #2d3748;
 }
 
 .content {
